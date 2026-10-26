@@ -1,0 +1,10 @@
+{
+  "description": "An online auction platform for rare books that leverages AI for scoring, condition detection, and fraud warnings, ensuring transparency and trust for users.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
