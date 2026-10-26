@@ -1,10 +1,12 @@
 {
-  "description": "An online auction platform for rare books that leverages AI for scoring, condition detection, and fraud warnings, ensuring transparency and trust for users.",
+  "description": "Bản xem trước giao diện BookBid: khám phá sách, đấu giá, kiểm duyệt và giao dịch. Dữ liệu minh họa, chưa kết nối Backend.",
   "robots": {
     "index": false
   },
   "accessibility": {
     "addBypassLinks": false,
     "ignoreReducedMotion": false
-  }
+  },
+  "title": "BookBid · Không gian đấu giá sách",
+  "language": "vi"
 }
