@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useDemo } from "../demo/DemoProvider";
 import type { Auction, Criterion } from "../domain/types";
 import { date } from "../lib/format";
@@ -7,23 +7,6 @@ export default function AnalysisPanel({ auction }: { auction: Auction }) {
   const { state, user, run } = useDemo(),
     [group, setGroup] = useState<"rarity" | "physical">("rarity"),
     analysis = state.analyses[auction.id];
-  useEffect(() => {
-    if (
-      analysis?.state !== "running" ||
-      user?.role !== "admin" ||
-      state.connection === "offline"
-    )
-      return;
-    const timer = setTimeout(
-      () =>
-        run(
-          { type: "analysis", auctionId: auction.id, finish: true },
-          "Đã kết thúc lượt phân tích minh họa. Không gọi Gemini thật.",
-        ),
-      1200,
-    );
-    return () => clearTimeout(timer);
-  }, [analysis?.state, auction.id, user?.role, state.connection]);
   if (!user || (user.role !== "admin" && user.id !== auction.sellerId))
     return null;
   if (!analysis)

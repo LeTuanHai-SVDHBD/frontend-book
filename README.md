@@ -1,22 +1,20 @@
-# BookBid — bản thiết kế Frontend sau Mốc 8
+# BookBid — bản thiết kế theo giao diện Figma cũ
 
-Bản xem trước tương tác để duyệt giao diện của hệ thống đấu giá sách Nhóm 15. Giữ phong cách navy, vàng và nền giấy của thiết kế cũ, đồng thời tổ chức lại các màn hình theo nghiệp vụ đang có.
+Bản thiết kế dùng **dữ liệu mẫu**, để Hải duyệt giao diện trước khi tích hợp vào dự án chính. Màu navy `#1f3a5f`, vàng `#d9a441`, nền kem `#f7f5f0`, font Inter/Playfair Display và kiểu thanh điều hướng được khôi phục theo mã giao diện gốc của repository.
 
-**Chỉ thay đổi repository `frontend-book`.** Dự án chính `my-project_book-auction-system`, nhánh `feat/Hai`, được đọc để đối chiếu tại commit [`b8f27a5`](https://github.com/LeTuanHai-SVDHBD/my-project_book-auction-system/commit/b8f27a5149f2958d01d34540558768731087bd9a). Chờ duyệt thiết kế trước khi tích hợp vào dự án chính.
+Chữ nền **20px trên desktop, 18px trên mobile**; tiêu đề lớn, form/nút rộng. Có ảnh thư viện ở trang chủ, gallery của cùng một bản sách, ô tìm kiếm và chuông thông báo.
 
-## Xem nhanh giao diện
+**Chỉ cập nhật `frontend-book`.** Nghiệp vụ đối chiếu từ [`my-project_book-auction-system/feat/Hai` tại b8f27a5](https://github.com/LeTuanHai-SVDHBD/my-project_book-auction-system/tree/b8f27a5149f2958d01d34540558768731087bd9a). Dự án chính sẽ được tích hợp sau khi chốt thiết kế.
 
-Ảnh chụp từ bản build của chính repository này:
+## Xem ảnh giao diện
 
-![Trang chủ BookBid trên desktop](docs/previews/home-desktop.jpg)
+![Trang chủ BookBid — chữ lớn theo thiết kế gốc](docs/previews/home-desktop.jpg)
 
-[Chi tiết phiên đấu giá](docs/previews/auction-desktop.jpg) · [Kiểm duyệt và hai điểm AI](docs/previews/moderation-desktop.jpg) · [Trang chủ trên mobile](docs/previews/home-mobile.jpg)
+[Chi tiết sách và gallery](docs/previews/auction-desktop.jpg) · [Khung video](docs/previews/video-desktop.jpg) · [Thông báo mẫu](docs/previews/notifications-desktop.jpg) · [Kiểm duyệt](docs/previews/moderation-desktop.jpg) · [Trang chủ mobile](docs/previews/home-mobile.jpg) · [Chi tiết mobile](docs/previews/auction-mobile.jpg)
 
-## Chạy để xem thiết kế
+## Chạy trên Windows
 
-Dùng Node.js 22.18 trở lên hoặc Node.js 24. Repository dùng pnpm; không cần API, worker, SQL Server, Redis hoặc API key.
-
-PowerShell, ở thư mục repository này:
+Tại thư mục **frontend-book**:
 
 ```powershell
 git switch main
@@ -25,62 +23,55 @@ npx.cmd pnpm@10.34.3 install --frozen-lockfile
 npx.cmd pnpm@10.34.3 dev
 ```
 
-Mở **http://localhost:8443**. Trên macOS/Linux, thay `npx.cmd` bằng `npx`. Nếu chưa có mã nguồn, clone `https://github.com/LeTuanHai-SVDHBD/frontend-book.git` trước.
+Mở **http://localhost:8443**. Dùng Node.js 22.18+ hoặc 24. Trên macOS/Linux, thay `npx.cmd` bằng `npx`. Nếu chưa có mã nguồn, clone `https://github.com/LeTuanHai-SVDHBD/frontend-book.git` trước.
 
-Cổng mặc định vẫn là 8443 của cấu hình Figma Make, khác cổng 5173 của dự án chính. Nếu 8443 đang được dùng, chọn cổng khác cho terminal hiện tại:
+Nếu cổng 8443 đã được dùng:
 
 ```powershell
 $env:PORT = "8444"
 npx.cmd pnpm@10.34.3 dev
 ```
 
-## Cách duyệt giao diện
+## Duyệt từng màn hình
 
-Thanh trên cùng ghi rõ đây là bản xem trước. Chọn **Xem với** để đổi giữa khách, người mua, chủ sách và hai Admin mẫu. Người mua/chủ sách là hai tài khoản thường dùng để kiểm tra quyền; đây không phải hai vai trò Backend riêng.
+- **Chọn màn hình để xem:** đi thẳng tới trang chủ, danh mục, sách đang đấu giá, kết quả, đăng sách, bài của tôi, AI riêng, giao dịch, khiếu nại hoặc Admin; chọn luôn tài khoản mẫu phù hợp.
+- **Bộ chọn vai trò:** xem cách giao diện thay đổi với khách/người mua/chủ sách/Admin. Đây là lựa chọn trình bày, không phải đăng nhập thật.
+- **Trạng thái mẫu:** chọn sẵn phản hồi đặt giá, trạng thái hai xác nhận/đánh giá, phân công khiếu nại và tình trạng AI.
+- **Gallery phiên 101:** 4 ảnh cùng một cuốn sách — bìa, gáy, trang tên và trang ruột — cùng khung video. Không có bộ chọn số lượng hoặc trộn ảnh của nhiều cuốn sách.
 
-Nút **Trạng thái mẫu** cho phép mô phỏng mất/kết nối lại, yêu cầu giá được chấp nhận/bị từ chối/đang chờ, trạng thái phiên và phiên đăng nhập bị thu hồi. **Khôi phục dữ liệu mẫu** đưa toàn bộ bản xem trước về ban đầu. Thay đổi trạng thái phiên ở đây thay thế cả dữ liệu mẫu liên quan để kết quả và giao dịch không mâu thuẫn.
+Các nút **đặt giá, gửi bài, duyệt/từ chối, gửi tin, xác nhận, đánh giá, khiếu nại và chọn tệp** chỉ hiển thị ghi chú thiết kế. Không lưu bài mới, đổi giá, ghi tin nhắn, tạo tài khoản hoặc upload tệp. Đồng hồ là số liệu cố định. Chuyển trang/tab/gallery, gõ trong form và chọn trạng thái chỉ phục vụ xem bố cục.
 
-- **Khách:** trang chủ, tìm và lọc sách, chi tiết phiên, lịch sử giá, bình luận và uy tín công khai.
-- **Người mua:** đặt giá, theo dõi phản hồi, giao dịch, chat, hai xác nhận độc lập, đánh giá sau hoàn tất và khiếu nại.
-- **Chủ sách:** đăng sách theo 4 bước, quản lý bài, bổ sung bài bị từ chối, xem AI riêng, kích hoạt bài đã duyệt và đăng lại khi đủ điều kiện.
-- **Admin:** kiểm duyệt cùng căn cứ và hai điểm AI độc lập; tiếp nhận, đối chiếu và phản hồi khiếu nại theo phân công.
+Ô tìm kiếm trên thanh điều hướng/trang chủ và danh sách thông báo là **thiết kế để phát triển sau**, chưa có chức năng Backend. Xem [ghi chú chức năng dự kiến](docs/future-features.md).
 
-Danh sách các trường hợp mẫu và checklist duyệt nằm ở [docs/design-review.md](docs/design-review.md). Đối chiếu endpoint và giới hạn tích hợp ở [docs/api-map.md](docs/api-map.md).
+## Phạm vi dữ liệu mẫu
 
-## Phạm vi bản xem trước
+Không gọi HTTP API, Socket.IO, Gemini, SQL Server, Redis hoặc Cloudinary. Không cần API key và không nhận mật khẩu/tệp thật. F5 khôi phục dữ liệu mẫu. Catalog chỉ lọc bộ dữ liệu mẫu nội bộ để xem bố cục kết quả/rỗng; chưa phải công cụ tìm kiếm hệ thống.
 
-Dữ liệu nằm trong bộ nhớ của một trang. F5 sẽ khôi phục dữ liệu mẫu; các tab không đồng bộ với nhau. Đăng nhập/đăng ký, upload, mất kết nối, xử lý giá và phân tích AI đều là mô phỏng để duyệt UI. Đổi vai trò không phải xác thực hoặc phân quyền an toàn. Không nhập mật khẩu thật.
+Ảnh gallery được tạo bằng imagegen cho bản thiết kế, không phải hồ sơ thẩm định hoặc ảnh xác nhận một ấn bản thật. Video là **khung trình phát minh họa, chưa gắn clip thật**. Font được lưu tại repo để hiển thị ổn định. Nguồn ảnh/font, prompt và giới hạn đối chiếu Figma được ghi ở [docs/design-sources.md](docs/design-sources.md).
 
-Tệp người dùng chọn chỉ được xem trước bằng object URL trên máy, không tải lên Cloudinary. Hai điểm AI và bằng chứng minh họa không phải kết quả thẩm định sách. Bìa SVG được tạo cho bản thiết kế, không đại diện ảnh thật hoặc xác nhận ấn bản. Không gọi Gemini, HTTP API, Socket.IO, SQL hoặc Redis và không lưu dữ liệu nghiệp vụ bên ngoài.
+Các quy tắc trình bày vẫn bám hệ thống hiện tại: chủ sách không có nút đặt giá; cooldown ẩn ô/nút nhập tiếp; giá kết thúc sớm và AI chỉ ở màn riêng của chủ/Admin; hai điểm AI độc lập và có NULL; đủ hai xác nhận mới hiện mẫu đánh giá cho người mua; chat khiếu nại chỉ hiện cho Admin được phân công khi hồ sơ đang xử lý.
 
-Khi tích hợp sau khi duyệt, Backend tiếp tục quyết định quyền, thời gian, kết quả đã COMMIT và điểm AI. `src/contracts/api.ts` chỉ ghi hợp đồng, chưa chứa HTTP client. Các giới hạn này được thể hiện ngay trên giao diện xem trước.
-
-## Kiểm tra mã nguồn
+## Kiểm tra
 
 ```powershell
 npx.cmd pnpm@10.34.3 typecheck
-npx.cmd pnpm@10.34.3 test
 npx.cmd pnpm@10.34.3 build
 ```
 
-11 bài kiểm tra xác minh quy tắc của adapter mẫu: số tiền 18 chữ số, quyền đặt giá, thời gian chờ, receipt không tạo trùng, xử lý offline, hai xác nhận, quyền đánh giá, quyền xử lý khiếu nại, đăng lại, kiểm duyệt, tính nhất quán kịch bản và dữ liệu chưa biết. Chúng không thay thế smoke test SQL/Redis của dự án chính.
+Kiểm tra Chromium gồm font thực tế, ảnh nội bộ, gallery/video, tìm kiếm/thông báo mẫu, nút nghiệp vụ không đổi dữ liệu và ma trận các trang desktop/mobile. Trang chủ/chi tiết được kiểm tra thêm ở 320px và 768px. Đây là kiểm tra **thiết kế**, không phải nghiệm thu Backend. Bộ mô phỏng xử lý nghiệp vụ và các test tương ứng ở bản trước đã được bỏ.
 
-Đã duyệt bằng Chromium ở desktop 1440px và mobile 390px: tìm kiếm/lọc/phân trang, đặt giá đủ trạng thái, tạo bài có media và chọn thể loại, duyệt/kích hoạt, AI có NULL, chat hiển thị HTML dưới dạng chữ, giao dịch/đánh giá, khiếu nại và giới hạn quyền Admin. Các trang còn lại được kiểm tra ảnh và tràn ngang. Không phát sinh lỗi console/page hoặc request `/api` trong hành trình kiểm tra. Danh sách chi tiết ở tài liệu duyệt thiết kế.
+## Tài liệu và cấu trúc
 
-Bản build production cũng được mở lại để kiểm tra asset nội bộ và chụp ảnh. Trang chủ và kiểm duyệt được kiểm tra thêm ở 320px và 768px, không tràn ngang.
+[Checklist duyệt thiết kế](docs/design-review.md) · [Đối chiếu API để tích hợp sau](docs/api-map.md) · [Tìm kiếm và thông báo dự kiến](docs/future-features.md) · [Nguồn thiết kế và tài nguyên](docs/design-sources.md)
 
-## Cấu trúc để phát triển tiếp
+| Vị trí                                        | Nội dung                                                        |
+| --------------------------------------------- | --------------------------------------------------------------- |
+| `src/components`                              | Layout, nút, form, gallery, khung giá mẫu, chat và AI           |
+| `src/pages`                                   | Màn hình theo nghiệp vụ hiện có                                 |
+| `src/demo`                                    | Fixture và lựa chọn trạng thái trình bày; không xử lý nghiệp vụ |
+| `src/domain`                                  | View model và điều kiện hiển thị                                |
+| `src/contracts`                               | Hợp đồng tham chiếu, chưa có HTTP client                        |
+| `src/styles/fonts.css`, `public/assets/fonts` | Font gốc, tự phục vụ trong repo, có giấy phép OFL               |
+| `src/index.css`                               | Màu, chữ lớn và layout responsive                               |
 
-| Thư mục          | Trách nhiệm                                                                |
-| ---------------- | -------------------------------------------------------------------------- |
-| `src/App.tsx`    | Ghép route và page; không chứa toàn bộ nghiệp vụ màn hình                  |
-| `src/components` | Layout, thẻ sách, dialog, trường tiền/thể loại/media, chat, bảng phân tích |
-| `src/pages`      | Trang công khai, không gian chủ sách, giao dịch, khiếu nại và Admin        |
-| `src/domain`     | Kiểu dữ liệu UI, quy tắc thuần và kiểm tra adapter mẫu                     |
-| `src/demo`       | Fixture, state provider, chuyển trạng thái trong bộ nhớ và object URL      |
-| `src/contracts`  | Hợp đồng HTTP tham chiếu từ `feat/Hai`, tách khỏi view model               |
-| `src/lib`        | Hash router, tiền dùng BigInt, định dạng và đồng hồ giao diện              |
-| `src/index.css`  | Token màu/chữ/khoảng cách và các layout responsive                         |
-| `public/covers`  | Bìa minh họa nội bộ, không phụ thuộc ảnh hoặc font từ bên ngoài            |
-
-React 19, TypeScript strict và Tailwind CSS 4 được giữ lại. Cấu hình và script Figma Make vẫn được giữ. Không thêm dependency runtime. Prettier được ghim ở devDependency để định dạng TypeScript/TSX/CSS; chạy `pnpm format` sau khi sửa và kiểm tra lại `pnpm typecheck`.
+React 19, TypeScript strict, Vite và Tailwind CSS 4 được giữ lại. Không thêm dependency runtime. `pnpm format` dùng Prettier. Các script/config Figma Make được giữ nguyên.

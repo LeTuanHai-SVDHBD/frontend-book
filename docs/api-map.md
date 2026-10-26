@@ -1,6 +1,6 @@
 # Đối chiếu UI với hệ thống đến Mốc 8
 
-Nguồn tham chiếu: nhánh [`feat/Hai` tại b8f27a5](https://github.com/LeTuanHai-SVDHBD/my-project_book-auction-system/tree/b8f27a5149f2958d01d34540558768731087bd9a), gồm `docs/flows.md`, `docs/realtime.md`, `docs/ai-analysis.md`, `docs/after-sales.md` và controller/service/validation tương ứng. Repository hiện tại chỉ dùng dữ liệu mẫu; bảng dưới là bản đồ cho giai đoạn tích hợp sau khi thiết kế được duyệt.
+Nguồn tham chiếu: nhánh [`feat/Hai` tại b8f27a5](https://github.com/LeTuanHai-SVDHBD/my-project_book-auction-system/tree/b8f27a5149f2958d01d34540558768731087bd9a), gồm `docs/flows.md`, `docs/realtime.md`, `docs/ai-analysis.md`, `docs/after-sales.md` và controller/service/validation tương ứng. Repository hiện tại chỉ dùng dữ liệu tĩnh và nút mở ghi chú, không mô phỏng xử lý nghiệp vụ; bảng dưới là bản đồ cho giai đoạn tích hợp sau khi thiết kế được duyệt.
 
 ## Màn hình và endpoint
 
@@ -44,10 +44,10 @@ Nguồn tham chiếu: nhánh [`feat/Hai` tại b8f27a5](https://github.com/LeTua
 
 Namespace `/auctions`: gửi `auction:watch` với `{auctionId}` hoặc `{catalog:true}`, sau ACK đọc lại HTTP snapshot. `auction:changed` chỉ là tín hiệu đọc lại; không chứa quyết định đặt giá riêng. Sau reconnect phải đăng ký lại room, đọc snapshot, trạng thái đặt lại và receipt của yêu cầu còn chờ. Poll bù mỗi 5 giây và khi quay lại tab theo triển khai hiện có. Chat riêng dùng HTTP polling theo dự án chính, không dùng room đấu giá công khai.
 
-Đồng hồ thật dựa `server_time` và độ trôi `performance.now()`, cập nhật lại khi đồng bộ. Đồng hồ Date.now trong adapter mẫu chỉ để duyệt thiết kế. Không tự công bố kết quả từ bộ đếm về 0; chỉ snapshot đã có kết quả Backend mới xác định thắng/thua.
+Đồng hồ thật dựa `server_time` và độ trôi `performance.now()`, cập nhật lại khi đồng bộ. Đồng hồ của bản mẫu là thời điểm cố định, chỉ để duyệt thiết kế. Không tự công bố kết quả từ bộ đếm về 0; chỉ snapshot đã có kết quả Backend mới xác định thắng/thua.
 
 ## Những chức năng không tự thêm vào thiết kế
 
 Không dựng thanh toán trực tuyến, hoàn tiền, vận chuyển, xóa bài/lưu nháp server, kết thúc phiên thủ công, chat đính kèm tệp, sửa/xóa đánh giá, xuất báo cáo hoặc quản lý tài khoản tùy ý khi Backend hiện tại chưa có hợp đồng tương ứng. Trang hệ thống chỉ là mẫu hình thức trạng thái/probe; không coi màu xanh mẫu là SQL/Redis thật đã sẵn sàng.
 
-Sau khi duyệt: tách lớp HTTP adapter khỏi `src/demo`, map DTO sang view model theo từng projection/quyền, giữ cơ chế tài khoản và realtime hiện có, rồi chạy lại smoke test các Mốc 4–8 với SQL/Redis và ảnh/video thật. Không dùng sự kiện mẫu hoặc kiểm tra client thay cho validation Backend.
+Sau khi duyệt: tạo lớp HTTP adapter riêng thay cho dữ liệu tĩnh ở `src/demo`, map DTO sang view model theo từng projection/quyền, giữ cơ chế tài khoản và realtime hiện có, rồi chạy lại smoke test các Mốc 4–8 với SQL/Redis và ảnh/video thật. Không dùng sự kiện mẫu hoặc kiểm tra client thay cho validation Backend.

@@ -1,3 +1,4 @@
+import { PREVIEW_NOW } from "../lib/useClock";
 /** All books, covers, identities and evidence below are illustrative design fixtures, not appraised listings. */
 import type {
   Analysis,
@@ -198,7 +199,7 @@ export const genreGroups = [
   },
 ];
 export function createFixtures(): DemoState {
-  const now = Date.now(),
+  const now = PREVIEW_NOW,
     at = (offset: number) => new Date(now + offset).toISOString();
   const values: [string, string, number, string, string][] = [
     ["Vang Bóng Một Thời", "Nguyễn Tuân", 1940, "Văn học cổ điển", "6200000"],
@@ -268,7 +269,39 @@ export function createFixtures(): DemoState {
           "Bìa có dấu thời gian, một số trang ngả màu nhẹ. Chưa đủ ảnh để xác nhận toàn bộ liên kết và tình trạng từng trang.",
         evidence:
           "Người đăng cung cấp mô tả ấn bản và ảnh trang xuất bản để Admin kiểm tra. Chưa xác minh chữ ký, nguồn gốc hoặc số bản còn lại.",
-        media: [],
+        media:
+          index === 0
+            ? [
+                ...[
+                  "Bìa trước",
+                  "Gáy và mép giấy",
+                  "Trang tên sách",
+                  "Trang ruột",
+                ].map((title, crop) => ({
+                  id: `same-book-${crop}`,
+                  url: "/assets/book-gallery-sample.png",
+                  title,
+                  kind: "image" as const,
+                  crop,
+                })),
+                {
+                  id: "same-book-video",
+                  url: "",
+                  poster: "/assets/book-gallery-sample.png",
+                  title: "Video giới thiệu sách",
+                  kind: "video" as const,
+                  sampleVideo: true,
+                  crop: 0,
+                },
+              ]
+            : [
+                {
+                  id: `cover-${id}`,
+                  url: `/covers/book-${index + 1}.svg`,
+                  title: "Bìa sách minh họa",
+                  kind: "image" as const,
+                },
+              ],
         startPrice: price,
         currentPrice: [2, 5, 6, 7, 8].includes(index) ? null : price,
         step: "50000",
@@ -321,7 +354,7 @@ export function createFixtures(): DemoState {
     },
   );
   return {
-    viewer: "guest",
+    viewer: "buyer",
     auctions,
     privatePrices: Object.fromEntries(
       auctions.map((a) => [a.id, String(BigInt(a.startPrice) + 3000000n)]),

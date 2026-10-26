@@ -30,21 +30,25 @@ export default function ListingForm({
     [confirmed, setConfirmed] = useState(false),
     heading = useRef<HTMLHeadingElement>(null);
   const [draft, setDraft] = useState<ListingDraft>(() => ({
-    title: source?.title || "",
-    postTitle: source?.postTitle || "",
-    author: source?.author || "",
-    publisher: source?.publisher || "",
-    year: source?.year ? String(source.year) : "",
+    title: source?.title || "Vang Bóng Một Thời",
+    postTitle: source?.postTitle || "Vang Bóng Một Thời — Bản sách sưu tầm",
+    author: source?.author || "Nguyễn Tuân",
+    publisher: source?.publisher || "Thông tin nhà xuất bản mẫu",
+    year: source?.year ? String(source.year) : "1940",
     isbn: source?.isbn || "",
-    genre: source?.genre || "",
-    description: source?.description || "",
-    condition: source?.condition || "",
-    evidence: source?.evidence || "",
-    startPrice: source?.startPrice || "",
-    earlyPrice: source ? state.privatePrices[source.id] || "" : "",
-    step: source?.step || "",
+    genre: source?.genre || "Văn học cổ điển",
+    description:
+      source?.description || "Mô tả bản sách mẫu dùng để duyệt giao diện.",
+    condition:
+      source?.condition || "Bìa có dấu thời gian, trang ruột ngả màu nhẹ.",
+    evidence:
+      source?.evidence ||
+      "Nguồn đối chiếu và ảnh trang xuất bản sẽ được bổ sung vào hồ sơ thật.",
+    startPrice: source?.startPrice || "3500000",
+    earlyPrice: source ? state.privatePrices[source.id] || "" : "9000000",
+    step: source?.step || "50000",
     cooldown: source?.cooldown || 20,
-    media: source?.media || [],
+    media: source?.media || state.auctions[0].media,
   }));
   useEffect(() => {
     heading.current?.focus();

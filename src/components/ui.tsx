@@ -9,6 +9,8 @@ import type { ListingStatus } from "../domain/types";
 import { href } from "../lib/router";
 import type { Route } from "../domain/types";
 export type IconName =
+  | "bell"
+  | "play"
   | "search"
   | "arrow"
   | "book"
@@ -30,6 +32,18 @@ export type IconName =
   | "image";
 export function Icon({ name, size = 20 }: { name: IconName; size?: number }) {
   const paths: Record<IconName, ReactNode> = {
+    bell: (
+      <>
+        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+        <path d="M10 21h4" />
+      </>
+    ),
+    play: (
+      <>
+        <circle cx="12" cy="12" r="10" />
+        <path d="m10 8 6 4-6 4z" />
+      </>
+    ),
     search: (
       <>
         <circle cx="10.8" cy="10.8" r="6.8" />

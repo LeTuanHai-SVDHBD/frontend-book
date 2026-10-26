@@ -20,6 +20,9 @@ export interface Media {
   title: string;
   kind: "image" | "video";
   local?: boolean;
+  crop?: number;
+  poster?: string;
+  sampleVideo?: boolean;
 }
 export interface Bid {
   id: string;

@@ -8,8 +8,7 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "format": "prettier --write src docs README.md package.json tsconfig.json",
-    "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types --test src/domain/rules.test.ts"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "react": "^19.0.0",

@@ -1,14 +1,7 @@
 import { useState } from "react";
 import { useDemo } from "../demo/DemoProvider";
-import {
-  canRelist,
-  isPublic,
-  nextPrice,
-  phase,
-  bidError,
-} from "../domain/rules";
-import type { Auction } from "../domain/types";
-import { date, duration, money } from "../lib/format";
+import { isPublic, phase } from "../domain/rules";
+import { date, money } from "../lib/format";
 import useClock from "../lib/useClock";
 import {
   Badge,
@@ -20,268 +13,8 @@ import {
   Panel,
   Stars,
 } from "../components/ui";
-import { MoneyField } from "../components/fields";
-function BidPanel({ auction, now }: { auction: Auction; now: number }) {
-  const { state, user, run } = useDemo(),
-    [amount, setAmount] = useState(nextPrice(auction) || ""),
-    [requestId, setRequestId] = useState<string | null>(null),
-    [error, setError] = useState("");
-  const current = phase(auction, now),
-    own = user?.id === auction.sellerId,
-    receipt = requestId ? state.receipts[requestId] : null;
-  const prior = auction.bids.find((bid) => bid.userId === user?.id),
-    remaining = prior
-      ? Math.max(
-          0,
-          Math.ceil(
-            (Date.parse(prior.at) + auction.cooldown * 1000 - now) / 1000,
-          ),
-        )
-      : 0;
-  const eligible =
-    !!user && user.role === "nguoi_dung" && !own && current === "live";
-  function send() {
-    const problem = bidError(auction, user, amount);
-    if (problem) {
-      setError(problem);
-      return;
-    }
-    if (state.connection === "offline") {
-      setError("Đang mất kết nối. Chưa gửi mức giá.");
-      return;
-    }
-    setError("");
-    const id = crypto.randomUUID();
-    setRequestId(id);
-    run({
-      type: "bid",
-      receipt: {
-        requestId: id,
-        auctionId: auction.id,
-        userId: user!.id,
-        amount,
-        state: "dang_cho_xu_ly",
-      },
-    });
-  }
-  return (
-    <Panel className="bid-card">
-      <div className="bid-price">
-        <span>
-          {auction.outcome
-            ? "Giá thắng"
-            : auction.currentPrice === null
-              ? "Giá khởi điểm"
-              : "Giá hiện tại"}
-        </span>
-        <strong>
-          {money(
-            auction.outcome
-              ? auction.outcome.amount
-              : auction.currentPrice || auction.startPrice,
-          )}
-        </strong>
-        <small>
-          {auction.bids.length} lượt đặt hợp lệ <span>·</span> Bước giá{" "}
-          {money(auction.step)}
-        </small>
-      </div>
-      <div className="auction-clock">
-        <span>
-          <Icon name="clock" size={17} />
-          {current === "scheduled"
-            ? "Bắt đầu sau"
-            : current === "live"
-              ? "Thời gian còn lại"
-              : current === "closing"
-                ? "Đang chờ chốt phiên"
-                : "Phiên đã kết thúc"}
-        </span>
-        {["live", "scheduled"].includes(current) && (
-          <strong>
-            {duration(
-              Date.parse(
-                current === "scheduled" ? auction.startAt! : auction.endAt!,
-              ) - now,
-            )}
-          </strong>
-        )}
-        <small>
-          {current === "scheduled" ? "Bắt đầu" : "Kết thúc"}:{" "}
-          {date(current === "scheduled" ? auction.startAt : auction.endAt)}
-        </small>
-      </div>
-      {current === "ended" ? (
-        <div className="auction-result">
-          <Badge tone={auction.outcome?.winnerId ? "green" : "gray"}>
-            {auction.outcome?.winnerId
-              ? "Phiên có người thắng"
-              : "Không có người thắng"}
-          </Badge>
-          <p>
-            {auction.outcome?.winnerId
-              ? auction.outcome.winnerId === user?.id
-                ? "Bạn là người thắng phiên này."
-                : "Kết quả đã được lưu cho người có mức giá hợp lệ cao nhất."
-              : "Không có lượt đặt giá hợp lệ. Chỉ chủ sách được đăng lại bản sách này."}
-          </p>
-          <small>
-            {auction.outcome?.reason === "dat_gia_toi_thieu"
-              ? "Đạt điều kiện kết thúc sớm."
-              : "Kết thúc theo thời gian phiên."}
-          </small>
-          {state.trades
-            .filter(
-              (trade) =>
-                trade.auctionId === auction.id &&
-                [trade.buyerId, trade.sellerId].includes(user?.id || 0),
-            )
-            .map((trade) => (
-              <LinkButton key={trade.id} to={{ page: "trade", id: trade.id }}>
-                Mở giao dịch
-              </LinkButton>
-            ))}
-          {own && canRelist(auction) && (
-            <LinkButton
-              to={{ page: "relist", id: auction.id }}
-              variant="outline"
-            >
-              Đăng lại bản sách
-            </LinkButton>
-          )}
-        </div>
-      ) : current === "closing" ? (
-        <Notice tone="warning">
-          Đã hết giờ. Đang chờ máy chủ xác nhận kết quả; chưa công bố người
-          thắng.
-        </Notice>
-      ) : current === "scheduled" ? (
-        <Notice>
-          Phiên chưa đến giờ bắt đầu. Bạn có thể xem thông tin và quay lại đúng
-          lịch.
-        </Notice>
-      ) : !user ? (
-        <>
-          <Notice>Đăng nhập để tham gia phiên đấu giá này.</Notice>
-          <LinkButton to={{ page: "account" }}>Đăng nhập để đặt giá</LinkButton>
-        </>
-      ) : user.role === "admin" ? (
-        <Notice>Tài khoản Admin chỉ xem thông tin phiên và kết quả.</Notice>
-      ) : own ? (
-        <Notice>
-          Đây là bản sách của bạn. Bạn chỉ theo dõi phiên và kết quả tại đây.
-        </Notice>
-      ) : null}
-      {eligible && remaining > 0 && (
-        <div className="cooldown" role="status">
-          <Icon name="clock" />
-          <div>
-            <strong>Chờ {remaining} giây để đặt tiếp</strong>
-            <p>
-              Thời gian chờ tính từ mức giá được chấp nhận gần nhất của bạn.
-            </p>
-          </div>
-        </div>
-      )}
-      {eligible && !receipt && remaining === 0 && (
-        <form
-          onSubmit={(event) => {
-            event.preventDefault();
-            send();
-          }}
-        >
-          <MoneyField
-            label="Mức giá của bạn"
-            name="muc_gia"
-            value={amount}
-            onChange={setAmount}
-          />
-          <div className="suggested-price">
-            <span>Mức tiếp theo từ</span>
-            <button
-              type="button"
-              onClick={() => setAmount(nextPrice(auction) || "")}
-            >
-              {money(nextPrice(auction))}
-            </button>
-          </div>
-          <Button
-            type="submit"
-            variant="gold"
-            icon="gavel"
-            disabled={
-              state.connection === "offline" || nextPrice(auction) === null
-            }
-          >
-            Gửi mức giá
-          </Button>
-          <p className="field-hint">
-            Chỉ được chấp nhận sau khi xử lý và lưu thành công. Chờ đặt lại:{" "}
-            {auction.cooldown} giây.
-          </p>
-        </form>
-      )}
-      {receipt && (
-        <div className="bid-receipt" aria-live="polite">
-          <span className="eyebrow">Mức giá đã gửi</span>
-          <strong>{money(receipt.amount)}</strong>
-          <Notice
-            tone={
-              receipt.state === "da_chap_nhan"
-                ? "success"
-                : receipt.state === "bi_tu_choi"
-                  ? "danger"
-                  : "warning"
-            }
-          >
-            {receipt.state === "da_chap_nhan"
-              ? "Mức giá đã được chấp nhận."
-              : receipt.state === "bi_tu_choi"
-                ? `Mức giá bị từ chối: ${receipt.reason}`
-                : "Đang chờ xử lý. Chưa xác nhận mức giá thành công."}
-          </Notice>
-          <small className="receipt-id">
-            Mã yêu cầu: {receipt.requestId.slice(0, 8)}…
-          </small>
-          {receipt.state === "dang_cho_xu_ly" && (
-            <Button
-              variant="outline"
-              onClick={() =>
-                run(
-                  { type: "bid", receipt },
-                  "Thử lại giữ nguyên mã yêu cầu và mức giá, không tạo lượt mới.",
-                )
-              }
-            >
-              Thử lại cùng yêu cầu
-            </Button>
-          )}
-          {receipt.state !== "dang_cho_xu_ly" &&
-            eligible &&
-            remaining === 0 && (
-              <Button
-                onClick={() => {
-                  setRequestId(null);
-                  setAmount(nextPrice(auction) || "");
-                }}
-              >
-                Nhập mức giá tiếp theo
-              </Button>
-            )}
-        </div>
-      )}
-      {error && (
-        <p className="field-error" role="alert">
-          {error}
-        </p>
-      )}
-      <div className="bid-footnote">
-        <Icon name="shield" size={16} />
-        <span>Lịch sử công khai · Kết quả từ Backend</span>
-      </div>
-    </Panel>
-  );
-}
+import BidPanel from "../components/BidPreview";
+import BookMedia, { BookPhoto } from "../components/BookMedia";
 export default function AuctionDetail({ id }: { id: number }) {
   const { state, user, run } = useDemo(),
     now = useClock(),
@@ -303,15 +36,16 @@ export default function AuctionDetail({ id }: { id: number }) {
       </div>
     );
   const current = phase(auction, now),
-    media = [
-      {
-        id: "cover",
-        url: auction.cover,
-        title: "Bìa minh họa",
-        kind: "image" as const,
-      },
-      ...auction.media,
-    ],
+    media = auction.media.length
+      ? auction.media
+      : [
+          {
+            id: "cover",
+            url: auction.cover,
+            title: "Bìa minh họa",
+            kind: "image" as const,
+          },
+        ],
     selected = media[mediaIndex] || media[0];
   const reviews = state.trades.filter(
       (trade) =>
@@ -342,15 +76,18 @@ export default function AuctionDetail({ id }: { id: number }) {
       <div className="auction-layout">
         <div className="auction-book">
           <div className="detail-cover">
-            {selected.kind === "video" ? (
-              <video src={selected.url} controls />
-            ) : (
-              <img src={selected.url} alt={selected.title} />
-            )}
+            <BookMedia media={selected} />
             <span>
               {selected.title === "Bìa minh họa"
                 ? "Bìa minh họa · Không phải ảnh thẩm định"
                 : selected.title}
+            </span>
+          </div>
+          <div className="single-book-label">
+            <Badge tone="navy">01 bản sách</Badge>
+            <span>
+              {media.filter((item) => item.kind === "image").length} ảnh ·{" "}
+              {media.filter((item) => item.kind === "video").length} video
             </span>
           </div>
           {media.length > 1 && (
@@ -362,11 +99,13 @@ export default function AuctionDetail({ id }: { id: number }) {
                   key={item.id}
                   onClick={() => setMediaIndex(index)}
                 >
-                  {item.kind === "image" ? (
-                    <img src={item.url} alt="" />
-                  ) : (
-                    <Icon name="file" />
+                  <BookPhoto media={item} alt={item.title} />
+                  {item.kind === "video" && (
+                    <span className="thumbnail-play">
+                      <Icon name="play" size={28} />
+                    </span>
                   )}
+                  <b>{item.kind === "video" ? "Video" : item.title}</b>
                 </button>
               ))}
             </div>
@@ -376,7 +115,8 @@ export default function AuctionDetail({ id }: { id: number }) {
             <div>
               <b>Thông tin cần được đối chiếu với bản sách</b>
               <p>
-                Ảnh bìa và thông tin trong bản thiết kế là dữ liệu minh họa.
+                Cùng một bản sách qua nhiều góc nhìn. Ảnh được tạo để minh họa
+                thiết kế, không phải ảnh thẩm định thật.
               </p>
             </div>
           </div>
@@ -439,16 +179,16 @@ export default function AuctionDetail({ id }: { id: number }) {
               Xem nhận xét <Icon name="arrow" size={16} />
             </button>
           </div>
+          <aside className="auction-bid">
+            <BidPanel key={id} auction={auction} now={now} />
+            <div className="connection-status">
+              <i className={state.connection === "offline" ? "offline" : ""} />
+              {state.connection === "online"
+                ? "Dữ liệu mẫu · Không có kết nối nghiệp vụ"
+                : "Đang kết nối lại"}
+            </div>
+          </aside>
         </div>
-        <aside className="auction-bid">
-          <BidPanel key={id} auction={auction} now={now} />
-          <div className="connection-status">
-            <i className={state.connection === "offline" ? "offline" : ""} />
-            {state.connection === "online"
-              ? "Trạng thái đồng bộ · Mô phỏng"
-              : "Đang kết nối lại"}
-          </div>
-        </aside>
       </div>
       <section className="auction-tabs">
         <div className="tabs" role="tablist" aria-label="Thông tin phiên">

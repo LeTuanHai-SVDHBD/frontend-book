@@ -1,3 +1,4 @@
+import { BookPhoto } from "../components/BookMedia";
 import { useState } from "react";
 import { useDemo } from "../demo/DemoProvider";
 import { userName } from "../demo/fixtures";
@@ -120,13 +121,17 @@ export default function Admin() {
             <>
               <Panel className="moderation-book">
                 <div className="moderation-book-head">
-                  <img
-                    src={
-                      book.media.find((item) => item.kind === "image")?.url ||
-                      book.cover
+                  <BookPhoto
+                    media={
+                      book.media.find((item) => item.kind === "image") || {
+                        id: "cover",
+                        url: book.cover,
+                        title: book.title,
+                        kind: "image",
+                      }
                     }
-                    alt={book.title}
                   />
+
                   <div>
                     <ListingBadge status={book.status} />
                     <h2>{book.title}</h2>
@@ -280,7 +285,7 @@ export default function Admin() {
   );
 }
 export function SystemPage() {
-  const { user, state } = useDemo(),
+  const { user, state, explain } = useDemo(),
     [probe, setProbe] = useState<"idle" | "queued" | "completed">("idle");
   if (user?.role !== "admin")
     return (
@@ -347,13 +352,25 @@ export function SystemPage() {
         </div>
         <Button
           disabled={probe === "queued" || state.connection === "offline"}
-          onClick={() => {
-            setProbe("queued");
-            window.setTimeout(() => setProbe("completed"), 900);
-          }}
+          onClick={() =>
+            explain(
+              "Thiết kế nút kiểm tra hệ thống; không gọi API, SQL, Redis hoặc worker.",
+            )
+          }
         >
           {probe === "queued" ? "Đang kiểm tra mẫu…" : "Chạy probe minh họa"}
         </Button>
+        <label className="field">
+          <span>Trạng thái probe mẫu</span>
+          <select
+            value={probe}
+            onChange={(event) => setProbe(event.target.value as typeof probe)}
+          >
+            <option value="idle">Chưa kiểm tra</option>
+            <option value="queued">Đang chờ</option>
+            <option value="completed">Hiển thị kết quả mẫu</option>
+          </select>
+        </label>
         {probe !== "idle" && (
           <Notice tone={probe === "completed" ? "success" : "warning"}>
             {probe === "completed"

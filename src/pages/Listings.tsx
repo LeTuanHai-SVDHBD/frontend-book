@@ -1,3 +1,4 @@
+import BookMedia, { BookPhoto } from "../components/BookMedia";
 import { useState } from "react";
 import { useDemo } from "../demo/DemoProvider";
 import { canRelist, isPublic } from "../domain/rules";
@@ -241,14 +242,18 @@ export function ListingDetail({ id }: { id: number }) {
       )}
       <div className="private-listing-layout">
         <Panel className="listing-summary">
-          <img
+          <BookPhoto
             className="listing-cover"
-            src={
-              book.media.find((item) => item.kind === "image")?.url ||
-              book.cover
+            media={
+              book.media.find((item) => item.kind === "image") || {
+                id: "cover",
+                url: book.cover,
+                title: book.title,
+                kind: "image",
+              }
             }
-            alt={book.title}
           />
+
           <h2>Thông số riêng của bài</h2>
           <dl className="summary-list">
             <div>
@@ -335,11 +340,7 @@ export function ListingDetail({ id }: { id: number }) {
                 <div className="media-grid">
                   {book.media.map((item) => (
                     <figure key={item.id}>
-                      {item.kind === "image" ? (
-                        <img src={item.url} alt={item.title} />
-                      ) : (
-                        <video src={item.url} controls />
-                      )}
+                      <BookMedia media={item} />
                       <figcaption>{item.title}</figcaption>
                     </figure>
                   ))}

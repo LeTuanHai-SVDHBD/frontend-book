@@ -1,8 +1,9 @@
+import BookMedia from "./BookMedia";
 import { useEffect, useId, useRef, useState } from "react";
 import type { Media } from "../domain/types";
 import { digits, fold, money } from "../lib/format";
 import { genreGroups } from "../demo/fixtures";
-import { previewUrl, releaseUrl } from "../demo/media";
+import { useDemo } from "../demo/DemoProvider";
 import { Button, Icon } from "./ui";
 export function MoneyField({
   label,
@@ -207,60 +208,16 @@ export function GenreField({
     </div>
   );
 }
+/** Visual upload slots only: no file is read or uploaded by this design. */
 export function MediaPicker({
   value,
-  onChange,
   imagesOnly = false,
 }: {
   value: Media[];
   onChange: (value: Media[]) => void;
   imagesOnly?: boolean;
 }) {
-  const input = useRef<HTMLInputElement>(null),
-    [error, setError] = useState("");
-  const imageCount = value.filter((item) => item.kind === "image").length,
-    videoCount = value.length - imageCount;
-  function add(files: FileList | null) {
-    if (!files) return;
-    let result = [...value];
-    setError("");
-    for (const file of Array.from(files)) {
-      const image = ["image/jpeg", "image/png", "image/webp"].includes(
-          file.type,
-        ),
-        video = !imagesOnly && ["video/mp4", "video/webm"].includes(file.type);
-      if (!image && !video) {
-        setError(
-          "Chọn JPEG, PNG, WebP" + (imagesOnly ? "." : ", MP4 hoặc WebM."),
-        );
-        continue;
-      }
-      const count = result.filter(
-          (item) => item.kind === (image ? "image" : "video"),
-        ).length,
-        max = image ? (imagesOnly ? 5 : 12) : 3;
-      if (count >= max || file.size > (image ? 10 : 50) * 1048576) {
-        setError(
-          `Tối đa ${max} ${image ? "ảnh" : "video"}; mỗi tệp ${
-            image ? 10 : 50
-          } MB.`,
-        );
-        continue;
-      }
-      result = [
-        ...result,
-        {
-          id: crypto.randomUUID(),
-          url: previewUrl(file),
-          title: file.name,
-          kind: image ? "image" : "video",
-          local: true,
-        },
-      ];
-    }
-    onChange(result);
-    if (input.current) input.current.value = "";
-  }
+  const { explain } = useDemo();
   return (
     <div>
       <div
@@ -268,67 +225,57 @@ export function MediaPicker({
         onDragOver={(event) => event.preventDefault()}
         onDrop={(event) => {
           event.preventDefault();
-          add(event.dataTransfer.files);
+          explain(
+            "Thiết kế vùng tải tệp. Sau này bổ sung kiểm tra tệp, vé upload và Cloudinary ở dự án chính.",
+          );
         }}
       >
         <span className="upload-icon">
-          <Icon name="upload" size={28} />
+          <Icon name="upload" size={40} />
         </span>
         <div>
           <strong>
-            Kéo thả {imagesOnly ? "ảnh bằng chứng" : "ảnh hoặc video"} vào đây
+            {imagesOnly
+              ? "Ảnh bằng chứng"
+              : "Ảnh và video của cùng một bản sách"}
           </strong>
           <p>
             {imagesOnly
-              ? "Tối đa 5 ảnh · 10 MB/ảnh"
-              : "JPEG, PNG, WebP · 10 MB/ảnh; MP4, WebM · 50 MB/video"}
+              ? "JPEG, PNG, WebP · Tối đa 5 ảnh"
+              : "JPEG, PNG, WebP · Tối đa 12 ảnh; MP4, WebM · Tối đa 3 video"}
           </p>
         </div>
-        <Button variant="outline" onClick={() => input.current?.click()}>
+        <Button
+          variant="outline"
+          onClick={() =>
+            explain(
+              "Nút chọn tệp — chỉ là thiết kế. Chưa đọc hoặc tải tệp lên hệ thống.",
+            )
+          }
+        >
           Chọn tệp
         </Button>
-        <input
-          ref={input}
-          className="sr-only"
-          type="file"
-          multiple
-          aria-label={
-            imagesOnly ? "Chọn ảnh bằng chứng" : "Chọn ảnh hoặc video sách"
-          }
-          accept={
-            imagesOnly
-              ? "image/jpeg,image/png,image/webp"
-              : "image/jpeg,image/png,image/webp,video/mp4,video/webm"
-          }
-          onChange={(event) => add(event.target.files)}
-        />
       </div>
       <p className="field-hint">
-        Đã chọn {imageCount} ảnh{!imagesOnly && ` và ${videoCount} video`}. Tệp
-        chỉ được xem trước trong phiên thiết kế này.
+        {value.length
+          ? `${value.filter((item) => item.kind === "image").length} ảnh và ${value.filter((item) => item.kind === "video").length} video minh họa`
+          : "Vị trí xem trước tệp mẫu"}{" "}
+        · Không upload tệp thật.
       </p>
-      {error && (
-        <p role="alert" className="field-error">
-          {error}
-        </p>
-      )}
       <div className="media-grid">
         {value.map((item) => (
           <figure key={item.id}>
-            {item.kind === "image" ? (
-              <img src={item.url} alt={item.title} />
-            ) : (
-              <video controls src={item.url} />
-            )}
-            <figcaption title={item.title}>{item.title}</figcaption>
+            <BookMedia media={item} />
+            <figcaption>{item.title}</figcaption>
             <button
               type="button"
               className="media-remove"
               aria-label={`Bỏ ${item.title}`}
-              onClick={() => {
-                if (item.local) releaseUrl(item.url);
-                onChange(value.filter((other) => other.id !== item.id));
-              }}
+              onClick={() =>
+                explain(
+                  "Thiết kế thao tác bỏ ảnh/video trước khi gửi bài. Dữ liệu mẫu được giữ nguyên.",
+                )
+              }
             >
               ×
             </button>

@@ -1,9 +1,5 @@
-import { useEffect, useState } from "react";
+/** Fixed design clock; there is no running auction or background timer in this prototype. */
+export const PREVIEW_NOW = Date.parse("2026-10-26T03:00:00.000Z");
 export default function useClock() {
-  const [now, setNow] = useState(Date.now);
-  useEffect(() => {
-    const timer = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(timer);
-  }, []);
-  return now;
+  return PREVIEW_NOW;
 }

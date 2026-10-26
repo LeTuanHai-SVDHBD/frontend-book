@@ -1,3 +1,4 @@
+import { PREVIEW_NOW } from "../lib/useClock";
 /** Pure rules used by the demo adapter; these do not replace Backend validation. */
 import type { Auction, Money, Trade, User } from "./types.ts";
 export const positiveMoney = (value: string) => /^[1-9]\d{0,17}$/.test(value);
@@ -5,7 +6,7 @@ export const isPublic = (auction: Auction) =>
   ["da_kich_hoat", "da_ket_thuc"].includes(auction.status);
 export function phase(
   auction: Auction,
-  now = Date.now(),
+  now = PREVIEW_NOW,
 ): "scheduled" | "live" | "closing" | "ended" | "private" {
   if (auction.status === "da_ket_thuc") return "ended";
   if (auction.status !== "da_kich_hoat" || !auction.startAt || !auction.endAt)
@@ -24,7 +25,7 @@ export function bidError(
   auction: Auction,
   user: User | null,
   amount: Money,
-  now = Date.now(),
+  now = PREVIEW_NOW,
 ): string | null {
   if (!user || user.role !== "nguoi_dung")
     return "Đăng nhập tài khoản người dùng để đặt giá.";

@@ -11,7 +11,7 @@ import {
   Panel,
 } from "../components/ui";
 export default function Account() {
-  const { user, run } = useDemo(),
+  const { user, run, explain } = useDemo(),
     [mode, setMode] = useState<"login" | "register">("login"),
     [password, setPassword] = useState(""),
     [confirmation, setConfirmation] = useState(""),
@@ -186,24 +186,14 @@ export default function Account() {
           <form
             onSubmit={(event) => {
               event.preventDefault();
-              setError("");
-              if (mode === "register") {
-                if (password !== confirmation) {
-                  setError("Hai mật khẩu chưa khớp.");
-                  return;
-                }
-                setRegistered(true);
-                setMode("login");
-                setPassword("");
-                setConfirmation("");
+              if (mode === "register" && password !== confirmation) {
+                setError("Hai mật khẩu chưa khớp.");
                 return;
               }
-              run(
-                { type: "viewer", value: "buyer" },
-                "Đang xem giao diện với người mua minh họa Minh An.",
+              setRegistered(false);
+              explain(
+                "Đây là thiết kế đăng nhập/đăng ký. Chọn vai trò mẫu ở thanh trên để xem giao diện; chưa tạo tài khoản hoặc phiên đăng nhập thật.",
               );
-              setPassword("");
-              go({ page: "catalog" });
             }}
           >
             {mode === "register" && (

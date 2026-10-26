@@ -1,3 +1,4 @@
+import { BookPhoto } from "./BookMedia";
 import type { Auction } from "../domain/types";
 import { phase } from "../domain/rules";
 import { money, duration } from "../lib/format";
@@ -31,11 +32,24 @@ export default function BookCard({
                 : "Đang đấu giá"}
           </Badge>
         </span>
-        <img
-          src={auction.cover}
-          alt={`Bìa minh họa ${auction.title}`}
-          loading="lazy"
+        <BookPhoto
+          media={
+            auction.media.find((item) => item.kind === "image") || {
+              id: "cover",
+              url: auction.cover,
+              title: auction.title,
+              kind: "image",
+            }
+          }
+          alt={`Ảnh minh họa ${auction.title}`}
         />
+        <span className="card-media-count">
+          <Icon name="image" size={18} />{" "}
+          {auction.media.filter((item) => item.kind === "image").length} ảnh
+          {auction.media.some((item) => item.kind === "video")
+            ? " · 1 video"
+            : ""}
+        </span>
         <span className="book-art-link">
           <Icon name="arrow" size={20} />
         </span>
