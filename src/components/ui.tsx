@@ -196,7 +196,7 @@ export function Badge({
 }
 export const listingLabels: Record<ListingStatus, string> = {
   cho_kiem_duyet: "Chờ kiểm duyệt",
-  tu_choi: "Cần bổ sung",
+  tu_choi: "Bị từ chối",
   da_qua_kiem_duyet: "Đã duyệt · chờ kích hoạt",
   da_kich_hoat: "Đã kích hoạt",
   da_ket_thuc: "Đã kết thúc",
@@ -309,11 +309,13 @@ export function Dialog({
   children,
   onClose,
   wide = false,
+  className = "",
 }: {
   title: string;
   children: ReactNode;
   onClose: () => void;
   wide?: boolean;
+  className?: string;
 }) {
   const ref = useRef<HTMLDialogElement>(null),
     id = useId();
@@ -325,7 +327,7 @@ export function Dialog({
   return (
     <dialog
       ref={ref}
-      className={`dialog ${wide ? "dialog-wide" : ""}`}
+      className={`dialog ${wide ? "dialog-wide" : ""} ${className}`}
       aria-labelledby={id}
       onCancel={(event) => {
         event.preventDefault();

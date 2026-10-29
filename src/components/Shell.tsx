@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useDemo } from "../demo/DemoProvider";
 import type { Route, Viewer } from "../domain/types";
 import { go, href } from "../lib/router";
@@ -78,18 +78,168 @@ export default function Shell({
     [presets, setPresets] = useState(false),
     [query, setQuery] = useState("");
   const admin = user?.role === "admin";
-  const links: { title: string; route: Route }[] = admin
-    ? [
-        { title: "Kiểm duyệt", route: { page: "moderation" } },
-        { title: "Khiếu nại", route: { page: "admin-complaints" } },
-        { title: "Danh mục", route: { page: "catalog" } },
-      ]
-    : [
-        { title: "Trang chủ", route: { page: "home" } },
-        { title: "Đấu giá", route: { page: "catalog" } },
-        { title: "Đăng sách", route: { page: "create" } },
-        { title: "Bài đăng của tôi", route: { page: "mine" } },
-      ];
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 1101px)");
+    const closeDrawer = () => {
+      if (desktop.matches) setMenu(false);
+    };
+    desktop.addEventListener("change", closeDrawer);
+    return () => desktop.removeEventListener("change", closeDrawer);
+  }, []);
+  const links: { title: string; route: Route }[] = [
+    { title: "Trang chủ", route: { page: "home" } },
+    { title: "Đấu giá", route: { page: "catalog" } },
+    { title: "Đăng sách", route: { page: "create" } },
+    { title: "Bài đăng của tôi", route: { page: "mine" } },
+  ];
+  const notificationItems = (
+    <>
+      <p className="notification-note">
+        Thiết kế mẫu · Chưa có chức năng thông báo thật
+      </p>
+      {(admin
+        ? [
+            {
+              icon: "file" as const,
+              title: "Có bài đăng chờ kiểm duyệt",
+              text: "Hồ sơ Việt Nam Văn Hóa Sử Cương đang chờ đối chiếu.",
+              time: "5 phút trước",
+            },
+            {
+              icon: "shield" as const,
+              title: "Có khiếu nại mới",
+              text: "Hồ sơ #501 đang chờ Admin tiếp nhận.",
+              time: "1 giờ trước",
+            },
+            {
+              icon: "grid" as const,
+              title: "Có kết quả phân tích AI",
+              text: "Mở hồ sơ riêng để kiểm tra bằng chứng và hai điểm hỗ trợ.",
+              time: "2 giờ trước",
+            },
+          ]
+        : [
+            {
+              icon: "gavel" as const,
+              title: "Phiên đấu giá sắp kết thúc",
+              text: "Vang Bóng Một Thời còn 35 phút.",
+              time: "5 phút trước",
+            },
+            {
+              icon: "file" as const,
+              title: "Bài đăng đã được duyệt",
+              text: "Bạn có thể thiết lập lịch và kích hoạt phiên.",
+              time: "1 giờ trước",
+            },
+            {
+              icon: "chat" as const,
+              title: "Tin nhắn trong giao dịch",
+              text: "Nguyễn Thành Nam đã gửi một tin nhắn.",
+              time: "2 giờ trước",
+            },
+          ]
+      ).map((item) => (
+        <div className="notification-item" key={item.title}>
+          <span>
+            <Icon name={item.icon} />
+          </span>
+          <div>
+            <b>{item.title}</b>
+            <p>{item.text}</p>
+            <small>{item.time}</small>
+          </div>
+        </div>
+      ))}
+      <button
+        className="notification-all"
+        onClick={() => {
+          setNotifications(false);
+          setMenu(false);
+          explain(
+            "Dự kiến bổ sung: danh sách thông báo, trạng thái đã đọc/chưa đọc và điều hướng tới đúng hồ sơ, phiên hoặc giao dịch. Hiện chỉ duyệt thiết kế.",
+          );
+        }}
+      >
+        Xem tất cả thông báo
+      </button>
+    </>
+  );
+  const adminNavigation = user && (
+    <>
+      <a href="#/moderation" className="brand" onClick={() => setMenu(false)}>
+        <span className="brand-mark">B</span>
+        <strong>BookBid</strong>
+      </a>
+      <span className="badge badge-gold">Quản trị viên</span>
+      <button
+        className="admin-notification-trigger"
+        aria-label="Thông báo"
+        aria-haspopup="dialog"
+        aria-expanded={notifications}
+        onClick={() => setNotifications(true)}
+      >
+        <span className="notification-trigger">
+          <Icon name="bell" size={25} />
+          <i />
+        </span>
+        <span>
+          Thông báo<small>Thông báo mẫu</small>
+        </span>
+        <span className="admin-notification-count" aria-label="3 thông báo mẫu">
+          3
+        </span>
+      </button>
+      <nav aria-label="Điều hướng quản trị">
+        {[
+          {
+            title: "Kiểm duyệt bài đăng",
+            page: "moderation",
+            icon: "file" as const,
+          },
+          {
+            title: "Khiếu nại",
+            page: "admin-complaints",
+            icon: "shield" as const,
+          },
+          { title: "Phiên đấu giá", page: "catalog", icon: "book" as const },
+          {
+            title: "Trạng thái hệ thống",
+            page: "system",
+            icon: "grid" as const,
+          },
+        ].map((item) => (
+          <a
+            key={item.page}
+            href={`#/${item.page}`}
+            aria-current={
+              route.page === item.page ||
+              (item.page === "admin-complaints" && route.page === "complaint")
+                ? "page"
+                : undefined
+            }
+            onClick={() => setMenu(false)}
+          >
+            <Icon name={item.icon} />
+            {item.title}
+          </a>
+        ))}
+      </nav>
+      <a
+        href="#/account"
+        className="admin-account"
+        aria-label={`Tài khoản Admin · ${user.name}`}
+        aria-current={route.page === "account" ? "page" : undefined}
+        onClick={() => setMenu(false)}
+      >
+        <span className="avatar">{user.initials}</span>
+        <span>
+          <b>{user.name}</b>
+          <small>Tài khoản quản trị</small>
+        </span>
+        <Icon name="chevron" size={18} />
+      </a>
+    </>
+  );
   return (
     <>
       <div className="preview-bar">
@@ -147,196 +297,152 @@ export default function Shell({
       >
         Đến nội dung chính
       </a>
-      <header className="site-header">
-        <div className="header-inner">
-          <a
-            className="brand"
-            href={href({ page: "home" })}
-            aria-label="BookBid · Trang chủ"
-          >
-            <span className="brand-mark">B</span>
-            <strong>BookBid</strong>
-          </a>
-          <form
-            className="nav-search"
-            role="search"
-            onSubmit={(event) => {
-              event.preventDefault();
-              explain(
-                "Ô tìm kiếm toàn hệ thống — thiết kế trước. Sau này bổ sung tìm theo tên sách, tác giả, ISBN và bộ lọc tại Backend.",
-              );
-            }}
-          >
-            <Icon name="search" size={25} />
-            <input
-              aria-label="Tìm kiếm toàn hệ thống"
-              placeholder="Tìm sách, tác giả, ISBN..."
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-            />
-            <button aria-label="Tìm kiếm mẫu" type="submit">
-              <Icon name="arrow" size={22} />
-            </button>
-          </form>
-          <nav className="desktop-nav" aria-label="Điều hướng chính">
-            {links.map((item) => (
-              <a
-                key={item.title}
-                href={href(item.route)}
-                aria-current={
-                  route.page === item.route.page ? "page" : undefined
-                }
-              >
-                {item.title}
-              </a>
-            ))}
-          </nav>
-          <div className="header-actions">
-            <button
-              className="notification-trigger icon-button"
-              aria-label="Thông báo"
-              aria-expanded={notifications}
-              onClick={() => setNotifications((value) => !value)}
-            >
-              <Icon name="bell" size={27} />
-              <i />
-            </button>
+      {!admin && (
+        <header className="site-header">
+          <div className="header-inner">
             <a
-              href={href({ page: "account" })}
-              className="avatar"
-              aria-label="Tài khoản"
+              className="brand"
+              href={href({ page: "home" })}
+              aria-label="BookBid · Trang chủ"
             >
-              {user?.initials || "LA"}
+              <span className="brand-mark">B</span>
+              <strong>BookBid</strong>
             </a>
-            <button
-              className="icon-button mobile-menu"
-              aria-label="Mở điều hướng"
-              aria-expanded={menu}
-              onClick={() => setMenu((value) => !value)}
-            >
-              <Icon name={menu ? "close" : "menu"} />
-            </button>
-          </div>
-        </div>
-        {menu && (
-          <nav className="mobile-nav" aria-label="Điều hướng di động">
-            {links.map((item) => (
-              <a
-                key={item.title}
-                href={href(item.route)}
-                onClick={() => setMenu(false)}
-              >
-                {item.title}
-              </a>
-            ))}
-            <a href="#/trades" onClick={() => setMenu(false)}>
-              Giao dịch
-            </a>
-            <a href="#/complaints" onClick={() => setMenu(false)}>
-              Khiếu nại
-            </a>
-          </nav>
-        )}
-        {notifications && (
-          <section className="notification-panel" aria-label="Thông báo mẫu">
-            <header>
-              <h2>Thông báo</h2>
-              <button
-                className="icon-button"
-                aria-label="Đóng thông báo mẫu"
-                onClick={() => setNotifications(false)}
-              >
-                ×
-              </button>
-            </header>
-            <p className="notification-note">
-              Thiết kế mẫu · Chưa có chức năng thông báo thật
-            </p>
-            {[
-              {
-                icon: "gavel" as const,
-                title: "Phiên đấu giá sắp kết thúc",
-                text: "Vang Bóng Một Thời còn 35 phút.",
-                time: "5 phút trước",
-              },
-              {
-                icon: "file" as const,
-                title: "Bài đăng đã được duyệt",
-                text: "Bạn có thể thiết lập lịch và kích hoạt phiên.",
-                time: "1 giờ trước",
-              },
-              {
-                icon: "chat" as const,
-                title: "Tin nhắn trong giao dịch",
-                text: "Nguyễn Thành Nam đã gửi một tin nhắn.",
-                time: "2 giờ trước",
-              },
-            ].map((item) => (
-              <div className="notification-item" key={item.title}>
-                <span>
-                  <Icon name={item.icon} />
-                </span>
-                <div>
-                  <b>{item.title}</b>
-                  <p>{item.text}</p>
-                  <small>{item.time}</small>
-                </div>
-              </div>
-            ))}
-            <button
-              className="notification-all"
-              onClick={() =>
+            <form
+              className="nav-search"
+              role="search"
+              onSubmit={(event) => {
+                event.preventDefault();
                 explain(
-                  "Dự kiến bổ sung: danh sách thông báo, trạng thái đã đọc/chưa đọc và điều hướng tới đúng phiên hoặc giao dịch. Hiện chỉ duyệt thiết kế.",
-                )
-              }
+                  "Ô tìm kiếm toàn hệ thống — thiết kế trước. Sau này bổ sung tìm theo tên sách, tác giả, ISBN và bộ lọc tại Backend.",
+                );
+              }}
             >
-              Xem tất cả thông báo
-            </button>
-          </section>
-        )}
-      </header>
-      {admin && (
-        <aside className="figma-admin-sidebar">
-          <a href="#/home" className="brand">
-            <span className="brand-mark">B</span>
-            <strong>BookBid</strong>
-          </a>
-          <span className="badge badge-gold">Quản trị viên</span>
-          <nav>
-            <a
-              href="#/moderation"
-              aria-current={route.page === "moderation" ? "page" : undefined}
-            >
-              <Icon name="file" />
-              Kiểm duyệt bài đăng
-            </a>
-            <a
-              href="#/admin-complaints"
-              aria-current={
-                ["admin-complaints", "complaint"].includes(route.page)
-                  ? "page"
-                  : undefined
-              }
-            >
-              <Icon name="shield" />
-              Khiếu nại
-            </a>
-            <a href="#/catalog">
-              <Icon name="book" />
-              Phiên đấu giá
-            </a>
-            <a href="#/system">
-              <Icon name="grid" />
-              Trạng thái hệ thống
-            </a>
-          </nav>
-          <div>
-            <span className="avatar">{user.initials}</span>
-            <b>{user.name}</b>
-            <small>Không gian quản trị · Mẫu</small>
+              <Icon name="search" size={25} />
+              <input
+                aria-label="Tìm kiếm toàn hệ thống"
+                placeholder="Tìm sách, tác giả, ISBN..."
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+              />
+              <button aria-label="Tìm kiếm mẫu" type="submit">
+                <Icon name="arrow" size={22} />
+              </button>
+            </form>
+            <nav className="desktop-nav" aria-label="Điều hướng chính">
+              {links.map((item) => (
+                <a
+                  key={item.title}
+                  href={href(item.route)}
+                  aria-current={
+                    route.page === item.route.page ? "page" : undefined
+                  }
+                >
+                  {item.title}
+                </a>
+              ))}
+            </nav>
+            <div className="header-actions">
+              <button
+                className="notification-trigger icon-button"
+                aria-label="Thông báo"
+                aria-expanded={notifications}
+                onClick={() => setNotifications((value) => !value)}
+              >
+                <Icon name="bell" size={27} />
+                <i />
+              </button>
+              <a
+                href={href({ page: "account" })}
+                className="avatar"
+                aria-label="Tài khoản"
+              >
+                {user?.initials || "LA"}
+              </a>
+              <button
+                className="icon-button mobile-menu"
+                aria-label="Mở điều hướng"
+                aria-expanded={menu}
+                onClick={() => setMenu((value) => !value)}
+              >
+                <Icon name={menu ? "close" : "menu"} />
+              </button>
+            </div>
           </div>
-        </aside>
+          {menu && (
+            <nav className="mobile-nav" aria-label="Điều hướng di động">
+              {links.map((item) => (
+                <a
+                  key={item.title}
+                  href={href(item.route)}
+                  onClick={() => setMenu(false)}
+                >
+                  {item.title}
+                </a>
+              ))}
+              <a href="#/trades" onClick={() => setMenu(false)}>
+                Giao dịch
+              </a>
+              <a href="#/complaints" onClick={() => setMenu(false)}>
+                Khiếu nại
+              </a>
+            </nav>
+          )}
+          {notifications && (
+            <section className="notification-panel" aria-label="Thông báo mẫu">
+              <header>
+                <h2>Thông báo</h2>
+                <button
+                  className="icon-button"
+                  aria-label="Đóng thông báo mẫu"
+                  onClick={() => setNotifications(false)}
+                >
+                  ×
+                </button>
+              </header>
+              {notificationItems}
+            </section>
+          )}
+        </header>
+      )}
+      {admin && (
+        <>
+          <aside
+            className="figma-admin-sidebar"
+            aria-label="Thanh điều hướng quản trị"
+          >
+            {adminNavigation}
+          </aside>
+          <div className="admin-mobile-menu">
+            <button
+              className="admin-menu-toggle"
+              aria-label="Mở điều hướng quản trị"
+              aria-haspopup="dialog"
+              aria-expanded={menu}
+              onClick={() => setMenu(true)}
+            >
+              <Icon name="menu" /> Menu quản trị
+            </button>
+          </div>
+          {menu && (
+            <Dialog
+              title="Điều hướng quản trị"
+              className="admin-navigation-drawer"
+              onClose={() => setMenu(false)}
+            >
+              <div className="figma-admin-sidebar">{adminNavigation}</div>
+            </Dialog>
+          )}
+          {notifications && (
+            <Dialog
+              title="Thông báo"
+              className="admin-notifications"
+              onClose={() => setNotifications(false)}
+            >
+              {notificationItems}
+            </Dialog>
+          )}
+        </>
       )}
       <div className={admin ? "admin-content-wrap" : ""}>
         <main id="main-content" tabIndex={-1}>
@@ -359,10 +465,22 @@ export default function Shell({
             <a href="#/auction/101">Chi tiết sách mẫu</a>
           </div>
           <div>
-            <strong>Không gian của bạn</strong>
-            <a href="#/mine">Quản lý bài đăng</a>
-            <a href="#/trades">Giao dịch và trò chuyện</a>
-            <a href="#/complaints">Khiếu nại của tôi</a>
+            <strong>
+              {admin ? "Không gian quản trị" : "Không gian của bạn"}
+            </strong>
+            {admin ? (
+              <>
+                <a href="#/moderation">Kiểm duyệt bài đăng</a>
+                <a href="#/admin-complaints">Xử lý khiếu nại</a>
+                <a href="#/account">Tài khoản quản trị</a>
+              </>
+            ) : (
+              <>
+                <a href="#/mine">Quản lý bài đăng</a>
+                <a href="#/trades">Giao dịch và trò chuyện</a>
+                <a href="#/complaints">Khiếu nại của tôi</a>
+              </>
+            )}
           </div>
           <div>
             <strong>Thiết kế BookBid</strong>

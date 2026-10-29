@@ -158,7 +158,7 @@ export default function Listings() {
                         {book.status === "da_qua_kiem_duyet"
                           ? "Đặt lịch & kích hoạt"
                           : book.status === "tu_choi"
-                            ? "Bổ sung bài đăng"
+                            ? "Bổ sung và gửi duyệt lại"
                             : "Xem chi tiết"}
                         <Icon name="arrow" size={16} />
                       </a>

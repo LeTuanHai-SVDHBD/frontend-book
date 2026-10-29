@@ -6571,12 +6571,157 @@ time {
   background: #d9a441;
   color: #132a47;
 }
-.figma-admin-sidebar > div {
+/* Account and notifications stay inside the Admin navigation. */
+.figma-admin-sidebar {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.figma-admin-sidebar > * {
+  flex-shrink: 0;
+}
+.admin-notification-trigger {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 76px;
+  width: 100%;
+  padding: 14px 12px;
+  border: 1px solid #ffffff30;
+  border-radius: 14px;
+  background: #ffffff0a;
+  color: #fff;
+  text-align: left;
+  font-size: 18px;
+  font-weight: 700;
+}
+.admin-notification-trigger > .notification-trigger {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 32px;
+  flex: none;
+}
+.admin-notification-trigger .notification-trigger i {
+  right: 0;
+  top: 0;
+  border-color: #132a47;
+}
+.admin-notification-trigger small,
+.admin-account small {
+  display: block;
+  margin-top: 4px;
+  font-weight: 400;
+}
+.admin-notification-count {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  margin-left: auto;
+  border-radius: 50%;
+  background: #d9a441;
+  color: #132a47;
+  font-size: 15px;
+}
+.admin-account {
   margin-top: auto;
   border-top: 1px solid #ffffff22;
-  padding-top: 22px;
-  display: grid;
-  gap: 10px;
+  padding: 22px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #fff;
+  text-decoration: none;
+}
+.admin-account > span:nth-child(2) {
+  min-width: 0;
+  flex: 1;
+}
+.admin-account b {
+  font-size: 18px;
+  overflow-wrap: anywhere;
+}
+.admin-account > svg {
+  flex: none;
+}
+.admin-account .avatar {
+  width: 44px;
+  height: 44px;
+  flex: none;
+}
+.figma-admin-sidebar nav a:hover,
+.admin-notification-trigger:hover {
+  background: #ffffff18;
+}
+.admin-account:hover b,
+.admin-account[aria-current="page"] b {
+  color: #f2c56e;
+}
+.figma-admin-sidebar :focus-visible {
+  outline: 3px solid #f2c56e;
+  outline-offset: 4px;
+}
+.admin-mobile-menu {
+  display: none;
+}
+.dialog.admin-notifications {
+  margin: auto;
+  width: min(480px, calc(100vw - 32px));
+}
+.admin-notifications .dialog-content {
+  padding-top: 0;
+}
+.admin-notifications .notification-note {
+  margin-top: 0;
+}
+.dialog.admin-navigation-drawer {
+  width: min(360px, calc(100vw - 24px));
+  max-width: none;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0 auto 0 0;
+  border: 0;
+  border-radius: 0 20px 20px 0;
+  padding: 0;
+  background: #132a47;
+  color: #fff;
+}
+.admin-navigation-drawer[open] {
+  display: flex;
+  flex-direction: column;
+}
+.admin-navigation-drawer > header {
+  flex: none;
+  padding: 20px;
+  border-bottom: 1px solid #ffffff22;
+}
+.dialog.admin-navigation-drawer > header h2 {
+  color: #fff;
+  font-family: "Inter", sans-serif;
+  font-size: 19px;
+}
+.admin-navigation-drawer > header button {
+  color: #fff;
+  background: #ffffff12;
+}
+.admin-navigation-drawer > .dialog-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0;
+}
+.admin-navigation-drawer .figma-admin-sidebar {
+  display: flex;
+  position: static;
+  width: 100%;
+  min-height: 100%;
+  padding: 24px 20px;
+  gap: 24px;
+  overflow: visible;
+}
+.admin-navigation-drawer::backdrop {
+  background: #0b1d32a6;
 }
 .figma-admin-sidebar small {
   color: #b7c6d9;
@@ -6844,15 +6989,6 @@ time {
   font-size: 18px;
 }
 @media (min-width: 1101px) {
-  body:has(.figma-admin-sidebar) .site-header {
-    margin-left: 280px;
-  }
-  body:has(.figma-admin-sidebar) .header-inner {
-    padding: 18px 32px;
-  }
-  body:has(.figma-admin-sidebar) .site-header .brand {
-    display: none;
-  }
   body:has(.figma-admin-sidebar) .preview-bar {
     padding-left: 304px;
     flex-wrap: wrap;
@@ -6946,8 +7082,24 @@ time {
   .header-inner {
     min-height: 88px;
   }
-  .figma-admin-sidebar {
+  aside.figma-admin-sidebar {
     display: none;
+  }
+  .admin-mobile-menu {
+    display: block;
+    padding: 20px 24px 0;
+  }
+  .admin-menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 52px;
+    padding: 12px 18px;
+    border-radius: 12px;
+    background: #132a47;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
   }
   .admin-content-wrap {
     margin-left: 0;

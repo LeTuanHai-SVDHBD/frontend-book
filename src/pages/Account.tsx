@@ -23,7 +23,11 @@ export default function Account() {
         <PageHeading
           eyebrow="Tài khoản của bạn"
           title={`Chào ${user.name.split(" ").slice(-2).join(" ")}`}
-          description="Một tài khoản cho cả hoạt động mua và bán sách."
+          description={
+            user.role === "admin"
+              ? "Không gian kiểm duyệt bài đăng và xử lý khiếu nại."
+              : "Một tài khoản cho cả hoạt động mua và bán sách."
+          }
         />
         <div className="profile-layout">
           <Panel className="profile-card">

@@ -10,7 +10,13 @@ Chữ nền **20px trên desktop, 18px trên mobile**; tiêu đề lớn, form/n
 
 ![Trang chủ BookBid — chữ lớn theo thiết kế gốc](docs/previews/home-desktop.jpg)
 
-[Chi tiết sách và gallery](docs/previews/auction-desktop.jpg) · [Khung video](docs/previews/video-desktop.jpg) · [Thông báo mẫu](docs/previews/notifications-desktop.jpg) · [Kiểm duyệt](docs/previews/moderation-desktop.jpg) · [Trang chủ mobile](docs/previews/home-mobile.jpg) · [Chi tiết mobile](docs/previews/auction-mobile.jpg)
+[Chi tiết sách và gallery](docs/previews/auction-desktop.jpg) · [Khung video](docs/previews/video-desktop.jpg) · [Thông báo mẫu](docs/previews/notifications-desktop.jpg) · [Kiểm duyệt](docs/previews/moderation-desktop.jpg) · [Thông báo Admin](docs/previews/admin-notifications-desktop.jpg) · [Menu Admin mobile](docs/previews/admin-menu-mobile.jpg) · [Trang chủ mobile](docs/previews/home-mobile.jpg) · [Chi tiết mobile](docs/previews/auction-mobile.jpg)
+
+## Bố cục Admin đã chốt
+
+Admin chỉ dùng **thanh điều hướng dọc**; chuông thông báo ở trên các mục quản trị, avatar/tên tài khoản ở cuối thanh và mở được trang tài khoản. Không có header ngang, lời mời đăng sách hoặc liên kết quản lý bài đăng cá nhân ở khu vực Admin. Trên màn hình từ 1100px trở xuống, bấm **Menu quản trị** để mở thanh dọc dạng ngăn kéo; có thể đóng bằng nút đóng, Escape hoặc chạm nền ngoài.
+
+Giữ luồng bài bị từ chối → bổ sung/gửi duyệt lại. Nhãn hiển thị là **Bị từ chối**, không thêm trạng thái mới. Giữ **hai bên xác nhận giao dịch** và **Admin tiếp nhận khiếu nại**; vẫn có hai Admin mẫu để duyệt quyền đọc chat đúng người xử lý. Các thao tác vẫn chỉ minh họa bằng dữ liệu mẫu.
 
 ## Chạy trên Windows
 

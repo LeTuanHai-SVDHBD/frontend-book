@@ -4,8 +4,20 @@
 
 - Navy `#1f3a5f`, vàng `#d9a441`, nền kem `#f7f5f0`, logo chữ B trong ô vàng.
 - Inter cho nội dung; Playfair Display đậm cho tiêu đề. Chữ nền desktop 20px, mobile 18px; tiêu đề chính desktop 44–56px, hero tới 70px; trường nhập/nút 56–64px.
-- Navbar có tìm kiếm, chuông và avatar; trang chủ có ảnh thư viện và ô tìm lớn; card bo tròn/đổ bóng, footer navy; Admin có sidebar navy.
+- Người dùng có navbar tìm kiếm, chuông và avatar; trang chủ có ảnh thư viện và ô tìm lớn; card bo tròn/đổ bóng, footer navy. Admin chỉ có sidebar navy, chuông ở trên menu và tài khoản ở cuối sidebar; không có header ngang hoặc lời mời đăng sách.
 - Nghiệp vụ được thể hiện qua **dữ liệu mẫu và trạng thái chọn sẵn**, không có tiến trình đặt giá/worker/SQL giả chạy phía client.
+
+## Các mục đã chốt giữ và điều chỉnh
+
+- `tu_choi` hiển thị **Bị từ chối**; nút **Bổ sung và gửi duyệt lại** dẫn tới luồng đã có, không tạo trạng thái “Cần bổ sung” riêng.
+- Giữ hai xác nhận giao dịch độc lập, đánh giá phía người mua sau hoàn tất.
+- Giữ Admin tiếp nhận khiếu nại và quyền xem chat chỉ đọc theo người xử lý; giữ Admin Phương/Huy để đối chiếu quyền.
+- Ẩn lời mời đăng sách ở danh mục khi xem bằng Admin. Footer Admin dẫn tới kiểm duyệt/khiếu nại/tài khoản, không dẫn tới quản lý bài cá nhân.
+- Sidebar Admin có chuông thông báo mẫu theo ngữ cảnh quản trị và avatar/tên mở trang tài khoản. Không render header ngang cho Admin.
+- Từ 1100px trở xuống, sidebar mở qua nút **Menu quản trị**. Ngăn kéo dùng dialog để giữ focus, hỗ trợ Escape, nút đóng, chạm nền ngoài và tự đóng khi quay lại desktop. Bảng thông báo có thể mở/đóng ngay từ ngăn kéo.
+- Thanh **Chọn màn hình để xem / Vai trò / Trạng thái mẫu** vẫn là công cụ duyệt bản thiết kế, không thuộc header sản phẩm khi tích hợp.
+
+Ảnh: [Admin desktop](previews/moderation-desktop.jpg), [thông báo Admin](previews/admin-notifications-desktop.jpg), [menu mobile](previews/admin-menu-mobile.jpg), [danh mục Admin desktop](previews/admin-catalog-desktop.jpg), [danh mục Admin mobile](previews/admin-catalog-mobile.jpg).
 
 ## Đường dẫn mẫu
 
@@ -34,12 +46,13 @@ Mở sau `http://localhost:8443/`, hoặc dùng bộ chọn **Chọn màn hình 
 - [ ] Màu, font, độ lớn chữ, hero và bố cục card đúng phong cách mong muốn.
 - [ ] Ảnh/video của cùng một bản sách; không có bộ chọn số lượng; bấm thumbnail đổi đúng góc ảnh.
 - [ ] Khung video có poster/nút play/thời lượng/thanh điều khiển mẫu, ghi rõ chưa có clip thật.
-- [ ] Navbar và trang chủ có ô tìm kiếm; chuông mở được bảng thông báo mẫu.
-- [ ] Menu mobile dễ mở, nội dung chính đọc rõ; form không cắt chữ/giá/nút.
+- [ ] Navbar người dùng và trang chủ có ô tìm kiếm; chuông mở bảng thông báo mẫu. Admin dùng chuông và tài khoản trong sidebar, không có header ngang.
+- [ ] Menu mobile người dùng và ngăn kéo Admin dễ mở; đóng bằng Escape/điều hướng; nội dung đọc rõ, không tràn ngang ở 320/390/768/1100px.
 - [ ] Chủ/Admin/khách không có ô đặt giá; chọn cooldown thì ẩn ô/nút nhập tiếp.
 - [ ] Hai điểm AI riêng, NULL được giải thích; không đưa AI/giá ẩn ra trang người mua.
 - [ ] Đánh giá chỉ hiện phía người mua; chọn mẫu hoàn tất mới có form đánh giá.
 - [ ] Chỉ Admin Phương được đọc chat khi chọn hồ sơ đang được giao xử lý; Admin Huy không có chat đó.
+- [ ] Nhãn **Bị từ chối** và nút **Bổ sung và gửi duyệt lại** đúng nghĩa; Admin không thấy lời mời đăng sách.
 - [ ] Các nút nghiệp vụ chỉ mở ghi chú, không đổi dữ liệu mẫu.
 
 ## Kiểm chứng và giới hạn
@@ -49,3 +62,5 @@ Kiểm tra TypeScript/build, Chromium desktop 1440px, mobile 390px; trang chủ/
 File Figma Make gốc được truy vấn bằng plugin; công cụ trả danh sách source/resource. Ở phiên triển khai này resource không đọc được qua cầu nối và công cụ screenshot không hỗ trợ Make. Vì vậy giao diện được khôi phục từ mã gốc trong repo, không tuyên bố đã đối chiếu pixel với ảnh Figma trực tiếp. Nguồn và thông số ở [design-sources.md](design-sources.md).
 
 Chưa kiểm tra SQL/Redis/Socket/Gemini hay trình duyệt khác. Các test xử lý nghiệp vụ ở bản mẫu trước đã bỏ vì bản này chỉ thiết kế; nghiệm thu tích hợp thuộc giai đoạn dự án chính sau khi duyệt.
+
+Kiểm tra bổ sung cho bố cục Admin đã chốt: Chromium trên production build ở 1440px và 1100/768/390/320px; chuông/tài khoản trong sidebar, mở thông báo từ ngăn kéo, Escape/focus, đóng khi đổi trang hoặc quay lại desktop; header/CTA người dùng giữ nguyên. Đối chiếu lại hai xác nhận, đánh giá riêng phía người mua, bổ sung bài bị từ chối và quyền chat giữa hai Admin. Không gọi API thật.

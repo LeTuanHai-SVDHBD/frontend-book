@@ -13,7 +13,7 @@ import {
   Pager,
 } from "../components/ui";
 export default function Catalog() {
-  const { state } = useDemo(),
+  const { state, user } = useDemo(),
     now = useClock(),
     [search, setSearch] = useState(
       () =>
@@ -183,20 +183,22 @@ export default function Catalog() {
           }
         />
       )}
-      <div className="catalog-bottom">
-        <Icon name="book" size={30} />
-        <div>
-          <h2>Bạn cũng có một câu chuyện để chia sẻ?</h2>
-          <p>Đưa bản sách của bạn đến với người biết trân trọng.</p>
+      {user?.role !== "admin" && (
+        <div className="catalog-bottom">
+          <Icon name="book" size={30} />
+          <div>
+            <h2>Bạn cũng có một câu chuyện để chia sẻ?</h2>
+            <p>Đưa bản sách của bạn đến với người biết trân trọng.</p>
+          </div>
+          <LinkButton
+            to={{ page: state.viewer === "guest" ? "account" : "create" }}
+            variant="outline"
+            icon="plus"
+          >
+            Đăng sách của bạn
+          </LinkButton>
         </div>
-        <LinkButton
-          to={{ page: state.viewer === "guest" ? "account" : "create" }}
-          variant="outline"
-          icon="plus"
-        >
-          Đăng sách của bạn
-        </LinkButton>
-      </div>
+      )}
     </div>
   );
 }
